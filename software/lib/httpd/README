@@ -1,0 +1,10 @@
+This is a lwip-based httpd which tries to be somewhat more compliant than the
+original LWIP sample. It can handle all sort of request, given proper coder's
+skills.
+
+It uses limited buffering (usually some hundred bytes) to draw the fine line
+between pure event driven parsers and bloated "let's eat everything first"
+servers. It - of course - uses the great lwip callback api.
+
+It also includes a simple engine to postprocess otherwise static files with
+dynamic information. But you can always write your own handler.
