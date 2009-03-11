@@ -1,0 +1,4 @@
+This port is based on a default config for the Xilinx/Digilent S3A starter kit.
+
+It has 64MB of 16bit x 133Mhz DDR2-SDRAM, which we underclock to about 120MHz 
+to get better timing results in the LA core. This, of course, needs to be fixed.
