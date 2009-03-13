@@ -1,0 +1,80 @@
+#Please do not modify this file by hand
+XmpVersion: 10.1.03
+VerMgmt: 10.1.03
+IntStyle: default
+ModuleSearchPath: user_cores
+MHS File: system.mhs
+MSS File: system.mss
+NPL File: projnav/system.ise
+Architecture: spartan3e
+Device: xc3s500e
+Package: fg320
+SpeedGrade: -4
+UserCmd1: 
+UserCmd1Type: 0
+UserCmd2: 
+UserCmd2Type: 0
+TopInst: system_i
+GenSimTB: 0
+InsertNoPads: 0
+WarnForEAArch: 1
+HdlLang: VHDL
+Simulator: mti
+SimModel: BEHAVIORAL
+MixLangSim: 1
+UcfFile: data/system.ucf
+FpgaImpMode: 0
+EnableParTimingError: 1
+EnableResetOptimization: 0
+ShowLicenseDialog: 1
+ICacheAddr: DDR_SDRAM,
+DCacheAddr: DDR_SDRAM,
+Processor: microblaze_0
+BootLoop: 0
+XmdStub: 0
+SwProj: la
+Processor: microblaze_0
+Executable: la/executable.elf
+Source: E:/fpga_la/s3e/LA_s3a_intr/la_net/vfs.c
+Source: E:/fpga_la/s3e/LA_s3a_intr/la_net/httpd.c
+Source: E:/fpga_la/s3e/LA_s3a_intr/la_net/la.c
+Source: E:/fpga_la/s3e/LA_s3a_intr/la_net/main.c
+DefaultInit: EXECUTABLE
+InitBram: 0
+Active: 1
+CompilerOptLevel: 2
+GlobPtrOpt: 0
+DebugSym: 1
+ProfileFlag: 0
+SearchLibs: E:/tmbinc_fpga/microblaze_0/lib
+LFlags: -llwip4
+ProgStart: 
+StackSize: 
+HeapSize: 
+LinkerScript: E:/fpga_la/s3e/LA_s3a_intr/la_net/la_net_linker_script.ld
+ProgCCFlags: 
+CompileInXps: 1
+NonXpsApp: 0
+SwProj: bootloader_0
+Processor: microblaze_0
+Executable: bootloader_0/executable.elf
+Source: bootloader_0/bootloader.c
+Source: bootloader_0/srec.c
+Header: bootloader_0/blconfig.h
+Header: bootloader_0/errors.h
+Header: bootloader_0/portab.h
+Header: bootloader_0/srec.h
+DefaultInit: executable
+InitBram: 1
+Active: 1
+CompilerOptLevel: 2
+GlobPtrOpt: 0
+DebugSym: 1
+ProfileFlag: 0
+ProgStart: 
+StackSize: 
+HeapSize: 
+LinkerScript: 
+ProgCCFlags: 
+CompileInXps: 1
+NonXpsApp: 0

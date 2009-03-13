@@ -1,0 +1,10 @@
+This port is based on a default config for the Xilinx/Digilent Spartan3E Starter Kit:
+http://www.xilinx.com/products/devkits/HW-SPAR3E-SK-US-G.htm
+http://digilentinc.com/Products/Detail.cfm?NavTop=2&NavSub=423&Prod=S3EBOARD
+
+It uses 32 of the GPIO pins on the Hirose FX2 connector as inputs.
+
+It has 32M of 16bit x 133Mhz DDR-SDRAM, which we underclock to about 120MHz 
+to get better timing results in the LA core. This, of course, needs to be fixed.
+
+It would also be nice to support the LEDs or LCD to display status.
