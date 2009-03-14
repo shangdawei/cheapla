@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-#include "la.h"
-
 	// the printf is buggy. I hate xilinx for this. Make sure to always use xil_printf.
 #define printf xil_printf
 
@@ -16,6 +14,7 @@
 #include "mb_interface.h"
 #include "xtmrctr_l.h"
 #include "xintc.h"
+#include "../../lib/la/la.h"
 
 #define EMAC_BASEADDR  XPAR_ETHERNET_MAC_BASEADDR
 
@@ -416,7 +415,6 @@ int main(void)
 	XCACHE_ENABLE_DCACHE(); 
 	printf("hello world\n");
 	
-	unsigned char *b = (void*)(XPAR_DDR2_SDRAM_MPMC_BASEADDR + 32*1024*1024);
 	int i;
 	
 	printf("[INT]");
@@ -437,16 +435,12 @@ int main(void)
 	httpd_start();
 
 	printf("init LA\n");
-#ifndef XPAR_DDR2_SDRAM_MPMC_BASEADDR
- // on S3E
-#define XPAR_DDR2_SDRAM_MPMC_BASEADDR XPAR_DDR_SDRAM_MPMC_BASEADDR
-#endif
-#define MEM_OFFSET 0x2000000 // 32MB
 
 	struct la_state my_la;
 	la = &my_la;
 	
-	la_init(la, (void*)XPAR_NPI_LA_0_BASEADDR, (void*)(XPAR_DDR2_SDRAM_MPMC_BASEADDR + MEM_OFFSET), MEM_OFFSET, 0x2000000); // use 32MB for LA samples
+	la_init(la, (void*)XPAR_NPI_LA_0_BASEADDR, (void*)(LA_BUFFER_BASEADDR + LA_BUFFER_OFFSET), 
+			LA_BUFFER_OFFSET, LA_BUFFER_SIZE); // use 32MB for LA samples
 	
 	printf("CheapLA ready!\n");
 
