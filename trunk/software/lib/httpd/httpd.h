@@ -16,6 +16,12 @@
 
 #define SENDBUFFER_LEN 16384
 
+#define HTTP_OK            200
+#define HTTP_BADREQ        400
+#define HTTP_NOTFOUND      404
+#define HTTP_INTERNALERROR 500
+
+
 struct http_state;
 
 extern int httpd_available_sendbuffer(struct http_state *http);

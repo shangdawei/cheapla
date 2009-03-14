@@ -1,6 +1,16 @@
 #ifndef __la_h
 #define __la_h
 
+#ifdef XPAR_DDR2_SDRAM_MPMC_BASEADDR
+#define LA_BUFFER_BASEADDR XPAR_DDR2_SDRAM_MPMC_BASEADDR
+#endif
+#ifdef XPAR_DDR_SDRAM_MPMC_BASEADDR
+#define LA_BUFFER_BASEADDR XPAR_DDR_SDRAM_MPMC_BASEADDR
+#endif
+
+#define LA_BUFFER_OFFSET (32 * 1024 * 1024)
+#define LA_BUFFER_SIZE   ( 4 * 1024 * 1024)
+
 struct la_state
 {
 	int offset;

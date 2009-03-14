@@ -13,8 +13,11 @@
 #include "lwip/tcp.h"
 #endif
 
+#include "xparameters.h"
+
 #include "vfs.h"
 #include "httpd.h"
+#include "../la/la.h"
 
 #define printf xil_printf
 
@@ -32,7 +35,7 @@ void httpd_init(struct http_state *http, int serial)
 	http->state_server = HTTPD_SERVER_IDLE;
 	http->state_client = HTTPD_CLIENT_REQUEST;
 	http->code_descr = 0;
-	http->code = 500;
+	http->code = HTTP_INTERNALERROR;
 	http->linebuffer_ptr = 0;
 	http->std_header_state = 0;
 	http->sendbuffer_read = http->sendbuffer_write = 0;
@@ -131,17 +134,17 @@ void httpd_get_descr(struct http_state *http)
 {
 	switch (http->code)
 	{
-	case 200:
+	case HTTP_OK:
 		http->code_descr = "OK";
 		break;
-	case 404:
+	case HTTP_NOTFOUND:
 		http->code_descr = "Not Found";
 		break;
-	case 400:
+	case HTTP_BADREQ:
 		http->code_descr = "Bad Request";
 		break;
 	default:
-	case 500:
+	case HTTP_INTERNALERROR:
 		http->code_descr = "Internal Server Error";
 		break;
 	}
@@ -201,7 +204,7 @@ static inline void httpd_receive_request(struct http_state *http, char c)
 	
 	if ((!*path) || (!*version) || strncmp(version, "HTTP/1.", 7))
 	{
-		http->code = 400;
+		http->code = HTTP_BADREQ;
 		path = "";
 	}
 	
@@ -475,7 +478,7 @@ static int response_file_process_request(struct http_state *http, const char *me
 	}
 	struct response_file_priv_s *priv = http->response_priv;
 	priv->f = f;
-	http->code = 200;
+	http->code = HTTP_OK;
 	return 1;
 }
 
@@ -533,7 +536,7 @@ static int response_vfs_process_request(struct http_state *http, const char *met
 	priv->f = f;
 	priv->hdr_state = 0;
 	priv->ptr = 0;
-	http->code = 200;
+	http->code = HTTP_OK;
 	return 1;
 }
 
@@ -671,8 +674,6 @@ struct response_mem_priv_s
 	int ptr, hdr_state;
 };
 
-#include "xparameters.h"
-
 static int response_mem_process_request(struct http_state *http, const char *method, const char *url)
 {
 	if (strcmp(method, "GET"))
@@ -686,11 +687,11 @@ static int response_mem_process_request(struct http_state *http, const char *met
 		return 0;
 	struct response_mem_priv_s *priv = http->response_priv;
 
-	priv->base = (void*)(XPAR_DDR2_SDRAM_MPMC_BASEADDR + 32*1024*1024);
+	priv->base = (LA_BUFFER_BASEADDR + LA_BUFFER_OFFSET);
 	priv->hdr_state = 0;
 	priv->ptr = 0;
-	priv->len = 2 * 1024 * 1024;
-	http->code = 200;
+	priv->len = LA_BUFFER_SIZE;
+	http->code = HTTP_OK;
 	return 1;
 }
 
@@ -760,7 +761,6 @@ static void response_mem_finish(struct http_state *http)
 
  	/* ---------- LA handler */
 
-#include "la.h"
 #include "mb_interface.h"
 
 struct la_state *la;
@@ -818,7 +818,7 @@ static int response_la_process_request(struct http_state *http, const char *meth
 	priv->hdr_state = 0;
 	priv->ptr = 0;
 	priv->len = la_get_wptr(la);
-	http->code = 200;
+	http->code = HTTP_OK;
 	return 1;
 }
 
@@ -903,7 +903,7 @@ static void response_la_finish(struct http_state *http)
 
 static int response_err400_process_request(struct http_state *http, const char *method, const char *url)
 {
-	if (http->code != 400)
+	if (http->code != HTTP_BADREQ)
 		return 0;
 	response_static_process_request(http, "<http><head><title>400</title></head>\r\n<body>400 - BAD REQUEST</body></html>\r\n");
 	return 1;
@@ -913,7 +913,7 @@ static int response_err400_process_request(struct http_state *http, const char *
 
 static int response_err404_process_request(struct http_state *http, const char *method, const char *url)
 {
-	http->code = 404;
+	http->code = HTTP_NOTFOUND;
 	response_static_process_request(http, "<http><head><title>404</title></head>\r\n<body>404 - Document not found</body></html>\r\n");
 	return 1;
 }
