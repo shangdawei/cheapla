@@ -792,6 +792,10 @@ static int response_la_process_request(struct http_state *http, const char *meth
 		command = 1;
 	else if (!strcmp(parm, "data"))
 		command = 2;
+	else if (!strncmp(parm, "trig", 4))
+		command = 3;
+	else if (!strncmp(parm, "mask", 4))
+		command = 4;
 	
 	if (command == -1)
 		return 0;
@@ -812,6 +816,37 @@ static int response_la_process_request(struct http_state *http, const char *meth
 		break;
 	case 2:
 		break;
+	case 3: {
+		   unsigned long trigger, trigger_mask;
+		char *ptr1, *ptr2;
+		ptr1 = index(parm, '_');
+		if (ptr1) {
+			trigger = strtoul(ptr1+1, &ptr2, 16);
+			if (ptr2) {
+				trigger_mask = strtoul(ptr2+1, NULL, 16);
+				hdprintf("+OK trigger=%08x mask=%08x\n", trigger, trigger_mask);
+				la_set_trigger(la, 0, trigger, trigger_mask);
+				break;
+			}
+		}
+		hdprintf("-INVALID TRIGGER\n");
+		break;
+		}
+	case 4:
+		{
+	   unsigned long mask;
+		char *ptr1;
+		ptr1 = index(parm, '_');
+		if (ptr1) {
+			mask = strtoul(ptr1+1, NULL, 16);
+			hdprintf("+OK mask=%08x\n", mask);
+			la_set_state_mask(la, mask);
+			break;
+		}
+		hdprintf("-INVALID MASK\n");
+		break;
+		}
+
 	}
 
 	priv->base = (void*)la->mem;
