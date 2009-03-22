@@ -39,6 +39,7 @@ Source: ../../../software/lib/httpd/vfs.c
 Source: ../../../software/lib/httpd/httpd.c
 Source: ../../../software/lib/la/la.c
 Source: ../../../software/apps/la_net/main.c
+Header: E:/cheapla/software/lib/la/la.h
 DefaultInit: EXECUTABLE
 InitBram: 0
 Active: 1
