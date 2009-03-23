@@ -2,7 +2,7 @@
 XmpVersion: 10.1.03
 VerMgmt: 10.1.03
 IntStyle: default
-ModuleSearchPath: C:/temp/myrep
+ModuleSearchPath: ../../repository/
 MHS File: system.mhs
 MSS File: system.mss
 NPL File: projnav/system.ise
@@ -32,66 +32,14 @@ DCacheAddr: DDR2_SDRAM,
 Processor: microblaze_0
 BootLoop: 1
 XmdStub: 0
-SwProj: TestApp_Memory
+SwProj: cheapla
 Processor: microblaze_0
-Executable: TestApp_Memory/executable.elf
-Source: TestApp_Memory/src/TestApp_Memory.c
-DefaultInit: EXECUTABLE
-InitBram: 0
-Active: 1
-CompilerOptLevel: 2
-GlobPtrOpt: 0
-DebugSym: 1
-ProfileFlag: 0
-ProgStart: 
-StackSize: 
-HeapSize: 
-LinkerScript: TestApp_Memory/src/TestApp_Memory_LinkScr.ld
-ProgCCFlags: 
-CompileInXps: 1
-NonXpsApp: 0
-SwProj: TestApp_Peripheral
-Processor: microblaze_0
-Executable: TestApp_Peripheral/executable.elf
-Source: TestApp_Peripheral/src/TestApp_Peripheral.c
-Source: TestApp_Peripheral/src/xintc_tapp_example.c
-Source: TestApp_Peripheral/src/xemaclite_selftest_example.c
-Source: TestApp_Peripheral/src/xemaclite_intr_tapp_example.c
-Source: TestApp_Peripheral/src/xspi_selftest_example.c
-Source: TestApp_Peripheral/src/xtmrctr_selftest_example.c
-Source: TestApp_Peripheral/src/xtmrctr_intr_example.c
-Source: TestApp_Peripheral/src/xuartlite_selftest_example.c
-Header: TestApp_Peripheral/src/intc_header.h
-Header: TestApp_Peripheral/src/emaclite_header.h
-Header: TestApp_Peripheral/src/emaclite_intr_header.h
-Header: TestApp_Peripheral/src/spi_header.h
-Header: TestApp_Peripheral/src/tmrctr_header.h
-Header: TestApp_Peripheral/src/tmrctr_intr_header.h
-Header: TestApp_Peripheral/src/uartlite_header.h
-DefaultInit: EXECUTABLE
-InitBram: 0
-Active: 1
-CompilerOptLevel: 2
-GlobPtrOpt: 0
-DebugSym: 1
-ProfileFlag: 0
-ProgStart: 
-StackSize: 
-HeapSize: 
-LinkerScript: TestApp_Peripheral/src/TestApp_Peripheral_LinkScr.ld
-ProgCCFlags: 
-CompileInXps: 1
-NonXpsApp: 0
-SwProj: la_net
-Processor: microblaze_0
-Executable: la_net/executable.elf
-Source: la_net/main.c
-Source: la_net/httpd.c
-Source: la_net/vfs.c
-Source: la_net/la.c
-Header: la_net/httpd.h
-Header: la_net/vfs.h
-Header: la_net/la.h
+Executable: data/cheapla.elf
+Source: ../../../software/lib/httpd/vfs.c
+Source: ../../../software/lib/httpd/httpd.c
+Source: ../../../software/lib/la/la.c
+Source: ../../../software/apps/la_net/main.c
+Header: ../../../software/lib/la/la.h
 DefaultInit: EXECUTABLE
 InitBram: 0
 Active: 1
@@ -103,7 +51,7 @@ LFlags: lwip4
 ProgStart: 
 StackSize: 
 HeapSize: 
-LinkerScript: la_net/la_net_linker_script.ld
-ProgCCFlags: -Wall
+LinkerScript: data/cheapla_linker_script.ld
+ProgCCFlags: 
 CompileInXps: 1
 NonXpsApp: 0
