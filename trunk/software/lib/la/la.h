@@ -9,7 +9,7 @@
 #endif
 
 #define LA_BUFFER_OFFSET (32 * 1024 * 1024)
-#define LA_BUFFER_SIZE   (16 * 1024 * 1024)
+#define LA_BUFFER_SIZE   (32 * 1024 * 1024)
 
 struct la_state
 {
