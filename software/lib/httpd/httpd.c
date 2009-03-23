@@ -824,12 +824,12 @@ static int response_la_process_request(struct http_state *http, const char *meth
 			trigger = strtoul(ptr1+1, &ptr2, 16);
 			if (ptr2) {
 				trigger_mask = strtoul(ptr2+1, NULL, 16);
-				hdprintf("+OK trigger=%08x mask=%08x\n", trigger, trigger_mask);
+				printf("+OK trigger=%08x mask=%08x\n", trigger, trigger_mask);
 				la_set_trigger(la, 0, trigger, trigger_mask);
 				break;
 			}
 		}
-		hdprintf("-INVALID TRIGGER\n");
+		printf("-INVALID TRIGGER\n");
 		break;
 		}
 	case 4:
@@ -839,11 +839,11 @@ static int response_la_process_request(struct http_state *http, const char *meth
 		ptr1 = index(parm, '_');
 		if (ptr1) {
 			mask = strtoul(ptr1+1, NULL, 16);
-			hdprintf("+OK mask=%08x\n", mask);
+			printf("+OK mask=%08x\n", mask);
 			la_set_state_mask(la, mask);
 			break;
 		}
-		hdprintf("-INVALID MASK\n");
+		printf("-INVALID MASK\n");
 		break;
 		}
 
