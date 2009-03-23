@@ -117,7 +117,9 @@ architecture IMP of user_logic is
 	signal timestamp: std_logic_vector(0 to 31);
 
 	signal engine_disable, ring_end_enable, ring_end_update, trigger_end_enable: std_logic;
-	signal ring_write_enable : std_logic;
+	signal ring_write_enable : std_logic; 
+	
+	signal ring_reset: std_logic;
 begin
 
   slv_reg_write_sel <= Bus2IP_WrCE(0 to 7);
@@ -233,7 +235,7 @@ begin
 
 	PORT MAP(
 		NPI_clk => NPI_clk,
-		NPI_rst => NPI_rst,
+		NPI_rst => ring_reset,
 		XIL_NPI_Addr => XIL_NPI_Addr,
 		XIL_NPI_AddrReq => XIL_NPI_AddrReq,
 		XIL_NPI_AddrAck => XIL_NPI_AddrAck,
@@ -261,6 +263,8 @@ begin
 		Ring_mask => ring_mask,
 		Status => status
 	);
+	
+	ring_reset <= NPI_rst or not engine_enabled;
 	
 	write_data <= la_timestamp & la_last; -- write stimestamp and new value
 	
