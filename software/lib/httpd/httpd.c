@@ -926,13 +926,16 @@ static int response_la_do_data(struct http_state *http)
 	if (av > (priv->size - priv->ptr))
 		av = priv->size - priv->ptr;
 
+	if (av > priv->len)
+		av = priv->len;
+
 	while (av)
 	{
 		int maxread = 1024;
 		if (maxread > av)
 			maxread = av;
 		microblaze_init_dcache_range((int)(priv->ptr + priv->base), maxread);
-		hdprintf("sending %08x..%08x\n", priv->ptr, priv->ptr+maxread);
+		hdprintf("sending %08x..%08x, len %08x, size %08x\n", priv->ptr, priv->ptr+maxread, priv->len, priv->size);
 		httpd_put_sendbuffer(http, (void*)(priv->ptr + priv->base), maxread);
 		priv->ptr += maxread;
 		priv->len -= maxread;
