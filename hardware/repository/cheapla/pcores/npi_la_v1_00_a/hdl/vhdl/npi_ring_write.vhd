@@ -91,6 +91,12 @@ begin
 	process (NPI_Clk)
 	begin
 		if NPI_Clk'event and NPI_Clk = '1' then
+
+				-- allow wptr update (also in reset)
+			if Ring_wptr_update = '1' then
+				Ring_wptr <= Ring_wptr_new;
+			end if;
+
 			if NPI_Rst = '1' then
 				write_fsm <= IDLE;
 			else
@@ -108,12 +114,6 @@ begin
 					when others =>
 						null;
 				end case;
-
-					-- allow wptr update
-				if Ring_wptr_update = '1' then
-					Ring_wptr <= Ring_wptr_new;
-				end if;
-
 			end if;
 		end if;
 		case write_fsm is
