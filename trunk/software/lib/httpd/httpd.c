@@ -21,7 +21,7 @@
 
 #define printf xil_printf
 
-#define hdprintf(x...)
+#define hdprintf(x...)  printf(x)
 // fprintf(stderr, x)
 
 /* do_* 0: "i'm done, go to next state", 1: "i'm waiting for more sendbuffer space, poll me again", 2: "poll me again NOW!" */
@@ -769,7 +769,7 @@ struct response_la_priv_s
 {
 	int command;
 
-	int ptr, len;
+	int ptr, size, len;
 	int hdr_state;
 	void *base;
 };
@@ -851,8 +851,23 @@ static int response_la_process_request(struct http_state *http, const char *meth
 
 	priv->base = (void*)la->mem;
 	priv->hdr_state = 0;
-	priv->ptr = 0;
-	priv->len = la_get_wptr(la);
+	
+	int did_wrap = la_get_wptr(la) >= la->size;
+
+	
+		// wptr without wrap-arounds and without remainder
+	int real_wptr = (la_get_wptr(la) & (la->size-1)) & ~0x3f;
+	hdprintf("did %swrap around, wptr = %08x\n", did_wrap ? "" : "not ", real_wptr);
+	if (!did_wrap)
+	{
+		priv->ptr = 0;
+		priv->size = priv->len = real_wptr;
+	} else
+	{
+		priv->ptr = real_wptr;
+		priv->len = la->size;
+		priv->size = la->size;
+	}
 	http->code = HTTP_OK;
 	return 1;
 }
@@ -908,8 +923,8 @@ static int response_la_do_data(struct http_state *http)
 	if (!av)
 		return 1;
 	
-	if (av > (priv->len - priv->ptr))
-		av = priv->len - priv->ptr;
+	if (av > (priv->size - priv->ptr))
+		av = priv->size - priv->ptr;
 
 	while (av)
 	{
@@ -917,12 +932,19 @@ static int response_la_do_data(struct http_state *http)
 		if (maxread > av)
 			maxread = av;
 		microblaze_init_dcache_range((int)(priv->ptr + priv->base), maxread);
+		hdprintf("sending %08x..%08x\n", priv->ptr, priv->ptr+maxread);
 		httpd_put_sendbuffer(http, (void*)(priv->ptr + priv->base), maxread);
 		priv->ptr += maxread;
+		priv->len -= maxread;
 		av -= maxread;
 	}
-	
-	if (priv->ptr == priv->len)
+
+	if (priv->ptr == priv->size)
+	{
+			/* wrap */
+		priv->ptr = 0;
+	}
+	if (!priv->len)
 		return 0;
 
 	return 1;

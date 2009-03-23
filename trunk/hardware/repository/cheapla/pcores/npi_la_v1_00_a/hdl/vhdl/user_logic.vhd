@@ -115,7 +115,9 @@ architecture IMP of user_logic is
 	signal update_wptr: std_logic;
 	
 	signal timestamp: std_logic_vector(0 to 31);
-	
+
+	signal engine_disable, ring_end_enable, ring_end_update, trigger_end_enable: std_logic;
+	signal ring_write_enable : std_logic;
 begin
 
   slv_reg_write_sel <= Bus2IP_WrCE(0 to 7);
@@ -131,13 +133,20 @@ begin
         slv_reg0 <= (others => '0');   -- ring_base
         slv_reg1 <= (others => '0');   -- ring_wptr
         slv_reg2 <= (others => '0');   -- ring_mask
-        slv_reg3 <= (others => '0');   -- command (EE)
+        slv_reg3 <= (others => '0');   -- ring_end, trigger_end_enable, ring_end_enable, engine_enable
         slv_reg4 <= (others => '0');   -- trigger0
         slv_reg5 <= (others => '0');   -- trigger0 mask
         slv_reg6 <= (others => '0');   -- state mask
-        slv_reg7 <= (others => '0');
+        slv_reg7 <= (others => '0');   -- trigger offset
       else
 			update_wptr <= '0';
+			if engine_disable = '1' then
+				slv_reg3(31) <= '0';
+			end if;
+			if ring_end_update = '1' then
+				slv_reg3(0 to 28) <= ring_wptr(0 to 28) + slv_reg7(0 to 28);	 -- set end address
+				slv_reg3(30) <= '1';  -- set ring_end_enable
+			end if;
         case slv_reg_write_sel is
 			when "10000000" =>
 				slv_reg0 <= Bus2IP_Data;
@@ -174,7 +183,12 @@ begin
 			if NPI_Rst = '1' then
 				la_last <= (others => '0');
 				timestamp <= (others => '0');
+				engine_disable <= '0';
+				ring_end_update <= '0';
 			else
+				engine_disable <= '0';
+				ring_end_update <= '0';
+				
 				timestamp <= timestamp + '1';
 				if (la_last and state_mask) /= (la_reg and state_mask) then
 					do_write <= '1';
@@ -184,16 +198,25 @@ begin
 				
 				if engine_enabled = '0' then
 					triggered <= '0';
-				elsif (trigger0_mask and la_reg) = trigger0 then
+				elsif (trigger0_mask and la_reg) = trigger0 then  -- we just triggered
 					triggered <= '1';
+					if triggered = '0' then  -- if this is the first trigger, update ring end
+						ring_end_update <= trigger_end_enable; 
+					end if;
+				end if;	
+				if (ring_wptr(0 to 28) and ring_mask(0 to 28)) = (slv_reg3(0 to 28) and ring_mask(0 to 28)) and slv_reg3(30) = '1' then -- if we reach stop ptr (and ring end enabled), then stop engine.
+					engine_disable <= '1'; 
 				end if;
 			end if;
 		end if;
 	end process;
   
+	ring_write_enable <= triggered or (trigger_end_enable and engine_enabled);
 	ring_base <= slv_reg0;
 	ring_mask <= slv_reg2;
-	engine_enabled <= slv_reg3(0);
+	engine_enabled <= slv_reg3(31); -- LSB
+	ring_end_enable <= slv_reg3(30);
+	trigger_end_enable <= slv_reg3(29);
 
 	trigger0 <= slv_reg4;
 	trigger0_mask <= slv_reg5;
@@ -230,7 +253,7 @@ begin
 		XIL_NPI_RdFIFO_Flush => XIL_NPI_RdFIFO_Flush,
 		In_Data => write_data,
 		In_Valid => do_write,
-		Ring_write_enable => triggered,
+		Ring_write_enable => ring_write_enable,
 		Ring_wptr_new => slv_reg1,
 		Ring_wptr_update => update_wptr,
 		Ring_wptr_current => ring_wptr,
@@ -247,9 +270,9 @@ begin
 
     case slv_reg_read_sel is
       when "10000000" => slv_ip2bus_data <= slv_reg0;
-      when "01000000" => slv_ip2bus_data <= ring_wptr; -- slv_reg1;
+      when "01000000" => slv_ip2bus_data <= ring_wptr(0 to 26) & status(27 to 31); -- slv_reg1;
       when "00100000" => slv_ip2bus_data <= slv_reg2;
-      when "00010000" => slv_ip2bus_data <= status; -- slv_reg3;
+      when "00010000" => slv_ip2bus_data <= slv_reg3;
       when "00001000" => slv_ip2bus_data <= la_reg; -- slv_reg4;
       when "00000100" => slv_ip2bus_data <= la_last; -- slv_reg5;
       when "00000010" => slv_ip2bus_data <= timestamp; -- slv_reg6;
