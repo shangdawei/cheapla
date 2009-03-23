@@ -447,7 +447,8 @@ int main(void)
 	while (1)
 	{
 		volatile unsigned int *npi = (void*)XPAR_NPI_LA_0_BASEADDR;
-		printf("|%08x %08x %08x %08x %08x %08x %08x %08x\r", npi[0], npi[1], npi[2], npi[3], npi[4], npi[5], npi[6], npi[7]);
+		printf("|base=%08x wptr=%08x buf_mask=%08x en=%08x la_reg=%08x la_last=%08x timestamp=%08x la_timestamp=%08x\r", 
+				npi[0], npi[1], npi[2], npi[3], npi[4], npi[5], npi[6], npi[7]);
 
 		network_poll();
 	}
