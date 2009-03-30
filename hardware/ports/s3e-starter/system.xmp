@@ -39,7 +39,7 @@ Source: ../../../software/lib/httpd/vfs.c
 Source: ../../../software/lib/httpd/httpd.c
 Source: ../../../software/lib/la/la.c
 Source: ../../../software/apps/la_net/main.c
-Header: E:/cheapla/software/lib/la/la.h
+Header: ../../../software/lib/la/la.h
 DefaultInit: EXECUTABLE
 InitBram: 0
 Active: 1
@@ -55,15 +55,12 @@ LinkerScript: data/cheapla_linker_script.ld
 ProgCCFlags: 
 CompileInXps: 1
 NonXpsApp: 0
-SwProj: bootloader_0
+SwProj: cheaploader
 Processor: microblaze_0
-Executable: bootloader_0/executable.elf
-Source: bootloader_0/bootloader.c
-Source: bootloader_0/srec.c
-Header: bootloader_0/blconfig.h
-Header: bootloader_0/errors.h
-Header: bootloader_0/portab.h
-Header: bootloader_0/srec.h
+Executable: data/cheaploader_s3e.elf
+Source: ../../../software/apps/cheaploader/cheaploader.c
+Header: ../../../software/apps/cheaploader/elf_abi.h
+Header: ../../../software/apps/cheaploader/blconfig.h
 DefaultInit: executable
 InitBram: 1
 Active: 1
